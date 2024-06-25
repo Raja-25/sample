@@ -1,0 +1,58 @@
+<div class="container mt-5">
+    <form (ngSubmit)="submitForm()">
+      <div class="mb-3">
+        <label for="mainQuestion" class="form-label">Ask a Main Question:</label>
+        <input type="text" class="form-control" id="mainQuestion" [(ngModel)]="questionData.mainQuestion" name="mainQuestion" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+  
+  <!-- Modal and additional questions -->
+  <div class="modal fade" tabindex="-1" [ngClass]="{'show d-block': showModal}" style="background: rgba(0,0,0,0.5);" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Additional Questions</h5>
+          <button type="button" class="btn-close" (click)="closeModal()"></button>
+        </div>
+        <div class="modal-body">
+          <p>{{ questionData.mainQuestion }}</p>
+          <form (ngSubmit)="submitModal()">
+            <div class="mb-3">
+              <label>Question 1:</label><br>
+              <input type="radio" id="q1-yes" name="q1" [(ngModel)]="answer1" value="yes" required> Yes<br>
+              <input type="radio" id="q1-no" name="q1" [(ngModel)]="answer1" value="no"> No<br>
+            </div>
+            <div class="mb-3">
+              <label>Question 2:</label><br>
+              <input type="radio" id="q2-yes" name="q2" [(ngModel)]="answer2" value="yes" required> Yes<br>
+              <input type="radio" id="q2-no" name="q2" [(ngModel)]="answer2" value="no"> No<br>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Additional fields -->
+  <div *ngIf="showModal && submitted" class="mt-3">
+    <h5>Additional Fields</h5>
+    <form (ngSubmit)="saveData()">
+      <div class="mb-3">
+        <label for="additionalQuestion1" class="form-label">Additional Question 1:</label>
+        <input type="text" class="form-control" id="additionalQuestion1" [(ngModel)]="questionData.additionalQuestion1" name="additionalQuestion1" required>
+      </div>
+      <div class="mb-3" *ngIf="answer1 === 'yes' && answer2 === 'yes'">
+        <label for="additionalQuestion2" class="form-label">Additional Question 2:</label>
+        <input type="text" class="form-control" id="additionalQuestion2" [(ngModel)]="questionData.additionalQuestion2" name="additionalQuestion2" required>
+      </div>
+      <div class="mb-3" *ngIf="answer1 === 'yes' && answer2 === 'yes'">
+        <label for="additionalQuestion3" class="form-label">Additional Question 3:</label>
+        <input type="text" class="form-control" id="additionalQuestion3" [(ngModel)]="questionData.additionalQuestion3" name="additionalQuestion3" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Save</button>
+    </form>
+  </div>
+  
