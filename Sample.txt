@@ -226,4 +226,69 @@ import { FormsModule } from '@angular/forms';
 export class AppModule { }
 ```
 
-This complete setup should fulfill your requirements without using a separate component for the dialog, embedding it directly within the `ItsiFormComponent`.
+This complete setup should fulfill your requirements without using a separate component for the dialog, embedding it directly within the `ItsiFormComponent
+import { Component, OnInit } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-create',
+  templateUrl: './create.component.html',
+  styleUrls: ['./create.component.css']
+})
+export class CreateComponent implements OnInit {
+  constructor(public dialog: MatDialog, private router: Router) {}
+
+  ngOnInit(): void {
+    const dialogRef = this.dialog.open(CreateDialog, {
+      width: '300px',
+      data: { question1: '', question2: '' }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result === 'yes-yes') {
+        // Navigate to the final create page or handle accordingly
+      } else {
+        // Show links or some other logic
+      }
+    });
+  }
+}
+
+@Component({
+  selector: 'create-dialog',
+  template: `
+    <h1 mat-dialog-title>Create</h1>
+    <div mat-dialog-content>
+      <p>Question 1?</p>
+      <mat-radio-group [(ngModel)]="data.question1">
+        <mat-radio-button value="yes">Yes</mat-radio-button>
+        <mat-radio-button value="no">No</mat-radio-button>
+      </mat-radio-group>
+      <p>Question 2?</p>
+      <mat-radio-group [(ngModel)]="data.question2">
+        <mat-radio-button value="yes">Yes</mat-radio-button>
+        <mat-radio-button value="no">No</mat-radio-button>
+      </mat-radio-group>
+    </div>
+    <div mat-dialog-actions>
+      <button mat-button (click)="onNoClick()">Cancel</button>
+      <button mat-button (click)="onYesClick()">OK</button>
+    </div>
+  `
+})
+export class CreateDialog {
+  constructor(
+    public dialogRef: MatDialogRef<CreateDialog>,
+    @Inject(MAT_DIALOG_DATA) public data: any
+  ) {}
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  onYesClick(): void {
+    const result = `${this.data.question1}-${this.data.question2}`;
+    this.dialogRef.close(result);
+  }
+}
