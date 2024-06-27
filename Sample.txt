@@ -292,3 +292,21 @@ export class CreateDialog {
     this.dialogRef.close(result);
   }
 }
+
+<form>
+  <div class="mb-3">
+    <label for="itsiInput" class="form-label">ITSI</label>
+    <input type="text" class="form-control" id="itsiInput" placeholder="Enter ITSI" required>
+  </div>
+
+  <div class="mb-3">
+    <label for="actionSelect" class="form-label">Action</label>
+    <select class="form-select" id="actionSelect" [(ngModel)]="selectedAction">
+      <option value="create">Create</option>
+      <option value="modify">Modify</option>
+      <option value="delete">Delete</option>
+    </select>
+  </div>
+
+  <button type="button" class="btn btn-primary" (click)="onSubmit()">Submit</button>
+</form>
