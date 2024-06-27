@@ -1,0 +1,194 @@
+Using Angular Material, we can create a modern UI for your page. Here are the steps to implement the required functionality:
+
+1. **Set up Angular Material**: If not already set up, add Angular Material to your project.
+2. **Create the Angular Component**: This will be the main page where users input the ITSI and select the operation.
+3. **Implement the Dialog**: This will be shown when the user selects "Create".
+4. **Routing**: Handle navigation based on user inputs.
+
+### Step 1: Set up Angular Material
+
+Install Angular Material, CDK, and Angular Animations:
+
+```bash
+ng add @angular/material
+```
+
+Choose a theme, add global typography, and include animations when prompted.
+
+### Step 2: Create the Angular Component
+
+Generate a new component:
+
+```bash
+ng generate component main
+ng generate component create-dialog
+```
+
+### Step 3: Main Component Template (main.component.html)
+
+Create the HTML structure using Angular Material components:
+
+```html
+<mat-card>
+  <mat-card-title>User Input Page</mat-card-title>
+  <mat-card-content>
+    <form (ngSubmit)="onSubmit()" #userForm="ngForm">
+      <mat-form-field appearance="fill">
+        <mat-label>ITSI</mat-label>
+        <input matInput type="text" [(ngModel)]="itsi" name="itsi" required>
+      </mat-form-field>
+      <mat-form-field appearance="fill">
+        <mat-label>Operation</mat-label>
+        <mat-select [(ngModel)]="operation" name="operation" required>
+          <mat-option value="create">Create</mat-option>
+          <mat-option value="modify">Modify</mat-option>
+          <mat-option value="delete">Delete</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <button mat-raised-button color="primary" type="submit">Submit</button>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<div *ngIf="showLinks">
+  <h2>Helpful Links</h2>
+  <ul>
+    <li><a href="link1">Link 1</a></li>
+    <li><a href="link2">Link 2</a></li>
+  </ul>
+</div>
+```
+
+### Step 4: Main Component Logic (main.component.ts)
+
+Handle the form submission, operation change, and dialog logic:
+
+```typescript
+import { Component } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
+import { Router } from '@angular/router';
+import { CreateDialogComponent } from '../create-dialog/create-dialog.component';
+
+@Component({
+  selector: 'app-main',
+  templateUrl: './main.component.html',
+  styleUrls: ['./main.component.css']
+})
+export class MainComponent {
+  itsi: string = '';
+  operation: string = 'create';
+  showLinks: boolean = false;
+
+  constructor(public dialog: MatDialog, private router: Router) {}
+
+  onSubmit() {
+    if (this.operation === 'create') {
+      const dialogRef = this.dialog.open(CreateDialogComponent);
+      dialogRef.afterClosed().subscribe(result => {
+        if (result === 'yes') {
+          this.router.navigate(['/another-page']);
+        } else {
+          this.showLinks = true;
+        }
+      });
+    } else {
+      this.router.navigate([`/${this.operation}`]);
+    }
+  }
+}
+```
+
+### Step 5: Create Dialog Component Template (create-dialog.component.html)
+
+Create the dialog content:
+
+```html
+<h2 mat-dialog-title>Confirmation</h2>
+<mat-dialog-content>
+  <mat-checkbox [(ngModel)]="question1">Question 1</mat-checkbox>
+  <mat-checkbox [(ngModel)]="question2">Question 2</mat-checkbox>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button (click)="onNoClick()">No</button>
+  <button mat-button [mat-dialog-close]="getResult()">Yes</button>
+</mat-dialog-actions>
+```
+
+### Step 6: Create Dialog Component Logic (create-dialog.component.ts)
+
+Handle the dialog logic:
+
+```typescript
+import { Component } from '@angular/core';
+import { MatDialogRef } from '@angular/material/dialog';
+
+@Component({
+  selector: 'app-create-dialog',
+  templateUrl: './create-dialog.component.html',
+  styleUrls: ['./create-dialog.component.css']
+})
+export class CreateDialogComponent {
+  question1: boolean = false;
+  question2: boolean = false;
+
+  constructor(public dialogRef: MatDialogRef<CreateDialogComponent>) {}
+
+  onNoClick(): void {
+    this.dialogRef.close();
+  }
+
+  getResult(): string {
+    return this.question1 && this.question2 ? 'yes' : 'no';
+  }
+}
+```
+
+### Step 7: Add Routing (app-routing.module.ts)
+
+Define the routes for different operations and the additional page:
+
+```typescript
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { MainComponent } from './main/main.component';
+import { ModifyComponent } from './modify/modify.component';
+import { DeleteComponent } from './delete/delete.component';
+import { AnotherPageComponent } from './another-page/another-page.component';
+
+const routes: Routes = [
+  { path: '', component: MainComponent },
+  { path: 'modify', component: ModifyComponent },
+  { path: 'delete', component: DeleteComponent },
+  { path: 'another-page', component: AnotherPageComponent },
+];
+
+@NgModule({
+  imports: [RouterModule.forRoot(routes)],
+  exports: [RouterModule]
+})
+export class AppRoutingModule { }
+step 8
+
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { FormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatDialogModule } from '@angular/material/dialog';
+
+import { AppComponent } from './app.component';
+import { MainComponent } from './main/main.component';
+import { CreateDialogComponent } from './create-dialog/create-dialog.component';
+import { AppRoutingModule } from './app-routing.module';
+
+@NgModule({
+  declarations: [
+    AppComponent,
+    MainComponent,
+    CreateDialogComponent
+  ],
+  imports:
