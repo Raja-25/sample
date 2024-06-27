@@ -1,312 +1,124 @@
-Sure! Here is the full code without using a separate component for the dialog:
+To use Bootstrap toasts in an Angular project and implement color schemes based on the type of message, follow these steps:
 
-### 1. Set Up the Project
+1. **Install Bootstrap**:
+   First, install Bootstrap if you haven't already. You can install it via npm:
+   ```bash
+   npm install bootstrap
+   ```
+   Then, include Bootstrap in your `angular.json` file:
+   ```json
+   "styles": [
+     "node_modules/bootstrap/dist/css/bootstrap.min.css",
+     "src/styles.css"
+   ],
+   "scripts": [
+     "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
+   ]
+   ```
 
-First, make sure you have Angular CLI installed. If not, install it using:
-```bash
-npm install -g @angular/cli
-```
+2. **Create a Toast Service**:
+   Create a service to manage toasts.
+   ```typescript
+   // toast.service.ts
+   import { Injectable } from '@angular/core';
 
-Create a new Angular project:
-```bash
-ng new my-angular-project
-cd my-angular-project
-```
+   @Injectable({
+     providedIn: 'root',
+   })
+   export class ToastService {
+     toasts: any[] = [];
 
-### 2. Install Angular Material
+     show(message: string, type: 'success' | 'info' | 'warning' | 'danger' = 'info') {
+       this.toasts.push({ message, type });
+     }
 
-Install Angular Material and Angular CDK:
-```bash
-ng add @angular/material
-```
+     remove(toast: any) {
+       this.toasts = this.toasts.filter(t => t !== toast);
+     }
+   }
+   ```
 
-### 3. Generate Components
+3. **Create a Toast Component**:
+   Create a component to display toasts.
+   ```typescript
+   // toast.component.ts
+   import { Component } from '@angular/core';
+   import { ToastService } from './toast.service';
 
-Generate the required components:
-```bash
-ng generate component itsi-form
-ng generate component create
-ng generate component modify
-ng generate component delete
-```
+   @Component({
+     selector: 'app-toast',
+     template: `
+       <div *ngFor="let toast of toastService.toasts" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1200;">
+         <div class="toast" [class.bg-success]="toast.type === 'success'" [class.bg-info]="toast.type === 'info'"
+           [class.bg-warning]="toast.type === 'warning'" [class.bg-danger]="toast.type === 'danger'" role="alert" aria-live="assertive" aria-atomic="true">
+           <div class="toast-header">
+             <strong class="me-auto">{{ toast.type | titlecase }}</strong>
+             <button type="button" class="btn-close" (click)="toastService.remove(toast)"></button>
+           </div>
+           <div class="toast-body">
+             {{ toast.message }}
+           </div>
+         </div>
+       </div>
+     `,
+     styles: []
+   })
+   export class ToastComponent {
+     constructor(public toastService: ToastService) { }
+   }
+   ```
 
-### 4. Set Up Routing
+4. **Add Toast Component to App Module**:
+   Ensure the `ToastComponent` is declared and included in the `AppModule`.
+   ```typescript
+   // app.module.ts
+   import { NgModule } from '@angular/core';
+   import { BrowserModule } from '@angular/platform-browser';
+   import { AppComponent } from './app.component';
+   import { ToastComponent } from './toast.component';
+   import { ToastService } from './toast.service';
 
-Update `app-routing.module.ts` to define routes for the `create`, `modify`, and `delete` components.
-```typescript
-import { NgModule } from '@angular/core';
-import { RouterModule, Routes } from '@angular/router';
-import { ItsiFormComponent } from './itsi-form/itsi-form.component';
-import { CreateComponent } from './create/create.component';
-import { ModifyComponent } from './modify/modify.component';
-import { DeleteComponent } from './delete/delete.component';
+   @NgModule({
+     declarations: [
+       AppComponent,
+       ToastComponent
+     ],
+     imports: [
+       BrowserModule
+     ],
+     providers: [ToastService],
+     bootstrap: [AppComponent]
+   })
+   export class AppModule { }
+   ```
 
-const routes: Routes = [
-  { path: '', component: ItsiFormComponent },
-  { path: 'create', component: CreateComponent },
-  { path: 'modify', component: ModifyComponent },
-  { path: 'delete', component: DeleteComponent },
-];
+5. **Use Toasts in Your Application**:
+   Inject the `ToastService` and use it to show toasts based on messages and types.
+   ```typescript
+   // app.component.ts
+   import { Component } from '@angular/core';
+   import { ToastService } from './toast.service';
 
-@NgModule({
-  imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
-})
-export class AppRoutingModule { }
-```
+   @Component({
+     selector: 'app-root',
+     template: `
+       <div class="container mt-5">
+         <button (click)="showToast('This is a success message!', 'success')" class="btn btn-success">Show Success Toast</button>
+         <button (click)="showToast('This is an info message!', 'info')" class="btn btn-info">Show Info Toast</button>
+         <button (click)="showToast('This is a warning message!', 'warning')" class="btn btn-warning">Show Warning Toast</button>
+         <button (click)="showToast('This is a danger message!', 'danger')" class="btn btn-danger">Show Danger Toast</button>
+       </div>
+       <app-toast></app-toast>
+     `,
+     styles: []
+   })
+   export class AppComponent {
+     constructor(private toastService: ToastService) { }
 
-### 5. Design the Form (itsi-form.component.html)
+     showToast(message: string, type: 'success' | 'info' | 'warning' | 'danger') {
+       this.toastService.show(message, type);
+     }
+   }
+   ```
 
-Create a form with an input field and a dropdown using Angular Material components. Add a button to trigger the action.
-```html
-<form>
-  <mat-form-field appearance="fill">
-    <mat-label>ITSI</mat-label>
-    <input matInput placeholder="Enter ITSI" required>
-  </mat-form-field>
-
-  <mat-form-field appearance="fill">
-    <mat-label>Action</mat-label>
-    <mat-select [(value)]="selectedAction">
-      <mat-option value="create">Create</mat-option>
-      <mat-option value="modify">Modify</mat-option>
-      <mat-option value="delete">Delete</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <button mat-raised-button color="primary" (click)="onSubmit()">Submit</button>
-</form>
-```
-
-### 6. Handle Form Submission (itsi-form.component.ts)
-
-Implement logic to handle form submission and show the dialog if the action is "create".
-```typescript
-import { Component } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-
-@Component({
-  selector: 'app-itsi-form',
-  templateUrl: './itsi-form.component.html',
-  styleUrls: ['./itsi-form.component.css']
-})
-export class ItsiFormComponent {
-  selectedAction: string = '';
-
-  constructor(public dialog: MatDialog, private router: Router) {}
-
-  onSubmit() {
-    if (this.selectedAction === 'create') {
-      const dialogRef = this.dialog.open(CreateDialog, {
-        width: '300px',
-        data: { question1: '', question2: '' }
-      });
-
-      dialogRef.afterClosed().subscribe(result => {
-        if (result === 'yes-yes') {
-          this.router.navigate(['/create']);
-        } else {
-          // Show links or some other logic
-        }
-      });
-    } else if (this.selectedAction === 'modify') {
-      this.router.navigate(['/modify']);
-    } else if (this.selectedAction === 'delete') {
-      this.router.navigate(['/delete']);
-    }
-  }
-}
-
-@Component({
-  selector: 'create-dialog',
-  template: `
-    <h1 mat-dialog-title>Create</h1>
-    <div mat-dialog-content>
-      <p>Question 1?</p>
-      <mat-radio-group [(ngModel)]="data.question1">
-        <mat-radio-button value="yes">Yes</mat-radio-button>
-        <mat-radio-button value="no">No</mat-radio-button>
-      </mat-radio-group>
-      <p>Question 2?</p>
-      <mat-radio-group [(ngModel)]="data.question2">
-        <mat-radio-button value="yes">Yes</mat-radio-button>
-        <mat-radio-button value="no">No</mat-radio-button>
-      </mat-radio-group>
-    </div>
-    <div mat-dialog-actions>
-      <button mat-button (click)="onNoClick()">Cancel</button>
-      <button mat-button (click)="onYesClick()">OK</button>
-    </div>
-  `
-})
-export class CreateDialog {
-  constructor(
-    public dialogRef: MatDialogRef<CreateDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  onYesClick(): void {
-    const result = `${this.data.question1}-${this.data.question2}`;
-    this.dialogRef.close(result);
-  }
-}
-```
-
-### 7. Implement Create, Modify, and Delete Components
-
-Add basic content for each component to differentiate them.
-
-**create.component.html**:
-```html
-<h1>Create Page</h1>
-```
-
-**modify.component.html**:
-```html
-<h1>Modify Page</h1>
-```
-
-**delete.component.html**:
-```html
-<h1>Delete Page</h1>
-```
-
-### 8. Update App Module
-
-Register the dialog component in your app module.
-
-```typescript
-import { NgModule } from '@angular/core';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatDialogModule } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatRadioModule } from '@angular/material/radio';
-import { AppRoutingModule } from './app-routing.module';
-import { AppComponent } from './app.component';
-import { ItsiFormComponent, CreateDialog } from './itsi-form/itsi-form.component';
-import { CreateComponent } from './create/create.component';
-import { ModifyComponent } from './modify/modify.component';
-import { DeleteComponent } from './delete/delete.component';
-import { FormsModule } from '@angular/forms';
-
-@NgModule({
-  declarations: [
-    AppComponent,
-    ItsiFormComponent,
-    CreateComponent,
-    ModifyComponent,
-    DeleteComponent,
-    CreateDialog
-  ],
-  imports: [
-    BrowserModule,
-    BrowserAnimationsModule,
-    MatDialogModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatButtonModule,
-    MatRadioModule,
-    AppRoutingModule,
-    FormsModule
-  ],
-  providers: [],
-  bootstrap: [AppComponent],
-  entryComponents: [CreateDialog]
-})
-export class AppModule { }
-```
-
-This complete setup should fulfill your requirements without using a separate component for the dialog, embedding it directly within the `ItsiFormComponent
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { Router } from '@angular/router';
-
-@Component({
-  selector: 'app-create',
-  templateUrl: './create.component.html',
-  styleUrls: ['./create.component.css']
-})
-export class CreateComponent implements OnInit {
-  constructor(public dialog: MatDialog, private router: Router) {}
-
-  ngOnInit(): void {
-    const dialogRef = this.dialog.open(CreateDialog, {
-      width: '300px',
-      data: { question1: '', question2: '' }
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result === 'yes-yes') {
-        // Navigate to the final create page or handle accordingly
-      } else {
-        // Show links or some other logic
-      }
-    });
-  }
-}
-
-@Component({
-  selector: 'create-dialog',
-  template: `
-    <h1 mat-dialog-title>Create</h1>
-    <div mat-dialog-content>
-      <p>Question 1?</p>
-      <mat-radio-group [(ngModel)]="data.question1">
-        <mat-radio-button value="yes">Yes</mat-radio-button>
-        <mat-radio-button value="no">No</mat-radio-button>
-      </mat-radio-group>
-      <p>Question 2?</p>
-      <mat-radio-group [(ngModel)]="data.question2">
-        <mat-radio-button value="yes">Yes</mat-radio-button>
-        <mat-radio-button value="no">No</mat-radio-button>
-      </mat-radio-group>
-    </div>
-    <div mat-dialog-actions>
-      <button mat-button (click)="onNoClick()">Cancel</button>
-      <button mat-button (click)="onYesClick()">OK</button>
-    </div>
-  `
-})
-export class CreateDialog {
-  constructor(
-    public dialogRef: MatDialogRef<CreateDialog>,
-    @Inject(MAT_DIALOG_DATA) public data: any
-  ) {}
-
-  onNoClick(): void {
-    this.dialogRef.close();
-  }
-
-  onYesClick(): void {
-    const result = `${this.data.question1}-${this.data.question2}`;
-    this.dialogRef.close(result);
-  }
-}
-
-<form>
-  <div class="mb-3">
-    <label for="itsiInput" class="form-label">ITSI</label>
-    <input type="text" class="form-control" id="itsiInput" placeholder="Enter ITSI" required>
-  </div>
-
-  <div class="mb-3">
-    <label for="actionSelect" class="form-label">Action</label>
-    <select class="form-select" id="actionSelect" [(ngModel)]="selectedAction">
-      <option value="create">Create</option>
-      <option value="modify">Modify</option>
-      <option value="delete">Delete</option>
-    </select>
-  </div>
-
-  <button type="button" class="btn btn-primary" (click)="onSubmit()">Submit</button>
-</form>
+With this setup, you can now display Bootstrap toasts with different color schemes based on the message type in your Angular application.
