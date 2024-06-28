@@ -68,3 +68,33 @@ export class YourComponent {
 <button (click)="showErrorToast()">Show Error Toast</button>
 <button (click)="showInfoToast()">Show Info Toast</button>
 <button (click)="showWarningToast()">Show Warning Toast</button>This setup will allow you to use ngx-toastr for toast notifications in your Angular application. The ngx-toastr library provides a comprehensive and flexible way to display toast messages and works well with Angular's versions
+
+_------------
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h4>Input and Dropdown Form</h4>
+        </div>
+        <div class="card-body">
+          <form (ngSubmit)="onSubmit()">
+            <div class="form-group mb-3">
+              <label for="textInput">Input Field</label>
+              <input type="text" class="form-control" id="textInput" [(ngModel)]="inputText" name="textInput" placeholder="Enter some text">
+            </div>
+            <div class="form-group mb-3">
+              <label for="selectInput">Dropdown</label>
+              <select class="form-control" id="selectInput" [(ngModel)]="selectedOption" name="selectInput">
+                <option value="option1">Option 1</option>
+                <option value="option2">Option 2</option>
+                <option value="option3">Option 3</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
