@@ -1,124 +1,70 @@
-To use Bootstrap toasts in an Angular project and implement color schemes based on the type of message, follow these steps:
+Given that you are using Angular 15 and do not want to use Bootstrap's built-in toast, you can use a separate package for toast notifications. One popular package for Angular is ngx-toastr. Here are the steps to set it up:Install ngx-toastr and @angular/animations:Since you already have @angular/animations installed, you only need to install ngx-toastr.npm install ngx-toastrImport BrowserAnimationsModule and ToastrModule in your AppModule:import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
-1. **Install Bootstrap**:
-   First, install Bootstrap if you haven't already. You can install it via npm:
-   ```bash
-   npm install bootstrap
-   ```
-   Then, include Bootstrap in your `angular.json` file:
-   ```json
-   "styles": [
-     "node_modules/bootstrap/dist/css/bootstrap.min.css",
-     "src/styles.css"
-   ],
-   "scripts": [
-     "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-   ]
-   ```
+@NgModule({
+  declarations: [
+    // your components
+  ],
+  imports: [
+    BrowserAnimationsModule, // required animations module
+    ToastrModule.forRoot() // ToastrModule added
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }Create a Toast Service:ng generate service toastImplement the service:import { Injectable } from '@angular/core';
+import { ToastrService } from 'ngx-toastr';
 
-2. **Create a Toast Service**:
-   Create a service to manage toasts.
-   ```typescript
-   // toast.service.ts
-   import { Injectable } from '@angular/core';
+@Injectable({
+  providedIn: 'root'
+})
+export class ToastService {
 
-   @Injectable({
-     providedIn: 'root',
-   })
-   export class ToastService {
-     toasts: any[] = [];
+  constructor(private toastr: ToastrService) { }
 
-     show(message: string, type: 'success' | 'info' | 'warning' | 'danger' = 'info') {
-       this.toasts.push({ message, type });
-     }
+  showSuccess(message: string, title: string) {
+    this.toastr.success(message, title);
+  }
 
-     remove(toast: any) {
-       this.toasts = this.toasts.filter(t => t !== toast);
-     }
-   }
-   ```
+  showError(message: string, title: string) {
+    this.toastr.error(message, title);
+  }
 
-3. **Create a Toast Component**:
-   Create a component to display toasts.
-   ```typescript
-   // toast.component.ts
-   import { Component } from '@angular/core';
-   import { ToastService } from './toast.service';
+  showInfo(message: string, title: string) {
+    this.toastr.info(message, title);
+  }
 
-   @Component({
-     selector: 'app-toast',
-     template: `
-       <div *ngFor="let toast of toastService.toasts" class="toast-container position-fixed bottom-0 end-0 p-3" style="z-index: 1200;">
-         <div class="toast" [class.bg-success]="toast.type === 'success'" [class.bg-info]="toast.type === 'info'"
-           [class.bg-warning]="toast.type === 'warning'" [class.bg-danger]="toast.type === 'danger'" role="alert" aria-live="assertive" aria-atomic="true">
-           <div class="toast-header">
-             <strong class="me-auto">{{ toast.type | titlecase }}</strong>
-             <button type="button" class="btn-close" (click)="toastService.remove(toast)"></button>
-           </div>
-           <div class="toast-body">
-             {{ toast.message }}
-           </div>
-         </div>
-       </div>
-     `,
-     styles: []
-   })
-   export class ToastComponent {
-     constructor(public toastService: ToastService) { }
-   }
-   ```
+  showWarning(message: string, title: string) {
+    this.toastr.warning(message, title);
+  }
+}Use the Toast Service in Your Component:Inject the ToastService into the component where you want to trigger the toast notification:import { Component } from '@angular/core';
+import { ToastService } from '../toast.service';
 
-4. **Add Toast Component to App Module**:
-   Ensure the `ToastComponent` is declared and included in the `AppModule`.
-   ```typescript
-   // app.module.ts
-   import { NgModule } from '@angular/core';
-   import { BrowserModule } from '@angular/platform-browser';
-   import { AppComponent } from './app.component';
-   import { ToastComponent } from './toast.component';
-   import { ToastService } from './toast.service';
+@Component({
+  selector: 'app-your-component',
+  templateUrl: './your-component.component.html',
+  styleUrls: ['./your-component.component.css']
+})
+export class YourComponent {
 
-   @NgModule({
-     declarations: [
-       AppComponent,
-       ToastComponent
-     ],
-     imports: [
-       BrowserModule
-     ],
-     providers: [ToastService],
-     bootstrap: [AppComponent]
-   })
-   export class AppModule { }
-   ```
+  constructor(private toastService: ToastService) { }
 
-5. **Use Toasts in Your Application**:
-   Inject the `ToastService` and use it to show toasts based on messages and types.
-   ```typescript
-   // app.component.ts
-   import { Component } from '@angular/core';
-   import { ToastService } from './toast.service';
+  showSuccessToast() {
+    this.toastService.showSuccess('This is a success message!', 'Success');
+  }
 
-   @Component({
-     selector: 'app-root',
-     template: `
-       <div class="container mt-5">
-         <button (click)="showToast('This is a success message!', 'success')" class="btn btn-success">Show Success Toast</button>
-         <button (click)="showToast('This is an info message!', 'info')" class="btn btn-info">Show Info Toast</button>
-         <button (click)="showToast('This is a warning message!', 'warning')" class="btn btn-warning">Show Warning Toast</button>
-         <button (click)="showToast('This is a danger message!', 'danger')" class="btn btn-danger">Show Danger Toast</button>
-       </div>
-       <app-toast></app-toast>
-     `,
-     styles: []
-   })
-   export class AppComponent {
-     constructor(private toastService: ToastService) { }
+  showErrorToast() {
+    this.toastService.showError('This is an error message!', 'Error');
+  }
 
-     showToast(message: string, type: 'success' | 'info' | 'warning' | 'danger') {
-       this.toastService.show(message, type);
-     }
-   }
-   ```
+  showInfoToast() {
+    this.toastService.showInfo('This is an info message!', 'Info');
+  }
 
-With this setup, you can now display Bootstrap toasts with different color schemes based on the message type in your Angular application.
+  showWarningToast() {
+    this.toastService.showWarning('This is a warning message!', 'Warning');
+  }
+}Call the respective toast methods from your template:<button (click)="showSuccessToast()">Show Success Toast</button>
+<button (click)="showErrorToast()">Show Error Toast</button>
+<button (click)="showInfoToast()">Show Info Toast</button>
+<button (click)="showWarningToast()">Show Warning Toast</button>This setup will allow you to use ngx-toastr for toast notifications in your Angular application. The ngx-toastr library provides a comprehensive and flexible way to display toast messages and works well with Angular's versions
