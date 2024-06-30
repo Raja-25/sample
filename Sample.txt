@@ -140,22 +140,18 @@ _---------------
 </body>
 </html>
 ----------
-<div class="container">
-    <div *ngIf="!found" class="alert alert-danger">
-        The app code which you have entered to delete is not existing
+<div *ngIf="found" class="card">
+  <div *ngIf="dep" class="card-body">
+    <div class="alert alert-info">
+      <h1 class="card-title">Important:</h1>
+      <p class="card-text">
+        Appcode {{ appcode }}' contains some dependencies, to delete this appcode you have to resolve those dependencies.
+      </p>
+      <h3 class="card-subtitle mb-2 text-muted">Dependencies:</h3>
+      <p class="card-text">jobs, calendars, global Variable</p>
     </div>
-
-    <div *ngIf="found" class="card">
-        <div *ngIf="dep" class="card-body">
-            <h1 class="card-title">Important:</h1>
-            <p class="card-text">
-                Appcode '{{ appcode }}' contains some dependencies, to delete this appcode you have to resolve those dependencies.
-            </p>
-            <h3 class="card-subtitle mb-2 text-muted">Dependencies:</h3>
-            <p class="card-text">jobs, calendars, global Variable</p>
-        </div>
-        <div *ngIf="!dep" class="card-body">
-            The Appcode does not have any dependencies it can be deleted.
-        </div>
-    </div>
+  </div>
+  <div *ngIf="Idep" class="card-body canbedel">
+    The Appcode does not have any dependencies it can be deleted.
+  </div>
 </div>
