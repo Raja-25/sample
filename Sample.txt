@@ -155,3 +155,13 @@ _---------------
     The Appcode does not have any dependencies it can be deleted.
   </div>
 </div>
+-----------
+<div *ngIf="found && dep" class="position-relative" (mouseenter)="showPopover=true" (mouseleave)="showPopover=false">
+  <button class="btn btn-danger" disabled>Delete</button>
+  <ng-container *ngIf="showPopover">
+    <div class="popover fade bs-popover-top show" role="tooltip" style="top: -40px; left: 50%; transform: translateX(-50%);">
+      <div class="arrow" style="left: 50%;"></div>
+      <div class="popover-body">It is disabled as you have dependencies</div>
+    </div>
+  </ng-container>
+</div>
