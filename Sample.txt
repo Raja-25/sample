@@ -183,3 +183,139 @@ export class DatePickerComponent implements OnInit {
     this.minDate = `${yyyy}-${mm}-${dd}`;
   }
 }
+----------------------------------------------------------------------
+Time difference calculation
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-date-time-form',
+  templateUrl: './date-time-form.component.html',
+  styleUrls: ['./date-time-form.component.css']
+})
+export class DateTimeFormComponent implements OnInit {
+  startDate: string = "";
+  startTime: string = "";
+  endDate: string = "";
+  endTime: string = "";
+  errorMessage: string = "";
+
+  minStartDate: string = "";
+  minEndDate: string = "";
+  maxEndDate: string = "";
+  minEndTime: string = "";
+  maxEndTime: string = "";
+
+  ngOnInit() {
+    this.setMinStartDate();
+  }
+
+  setMinStartDate() {
+    const now = new Date();
+    const minStartDateTime = new Date(now.getTime() + 24 * 60 * 60 * 1000); // Add 24 hours
+    this.minStartDate = this.formatDate(minStartDateTime);
+  }
+
+  updateEndDateLimits() {
+    if (this.startDate && this.startTime) {
+      const startDateTime = new Date(`${this.startDate}T${this.startTime}`);
+      const minEndDateTime = new Date(startDateTime.getTime() + 30 * 60000); // Add 30 minutes
+      const maxEndDateTime = new Date(startDateTime.getTime() + 24 * 60 * 60000); // Add 24 hours
+
+      this.minEndDate = this.formatDate(minEndDateTime);
+      this.maxEndDate = this.formatDate(maxEndDateTime);
+
+      // Reset end date and time
+      this.endDate = '';
+      this.endTime = '';
+      this.errorMessage = '';
+    }
+  }
+
+  updateEndTimeLimits() {
+    if (this.endDate) {
+      const startDateTime = new Date(`${this.startDate}T${this.startTime}`);
+      const minEndDateTime = new Date(startDateTime.getTime() + 30 * 60000); // Add 30 minutes
+      const maxEndDateTime = new Date(startDateTime.getTime() + 24 * 60 * 60000); // Add 24 hours
+
+      if (this.endDate === this.minEndDate) {
+        this.minEndTime = this.formatTime(minEndDateTime);
+      } else {
+        this.minEndTime = '00:00';
+      }
+
+      if (this.endDate === this.maxEndDate) {
+        this.maxEndTime = this.formatTime(maxEndDateTime);
+      } else {
+        this.maxEndTime = '23:59';
+      }
+    }
+  }
+
+  formatDate(date: Date): string {
+    return date.toISOString().split('T')[0];
+  }
+
+  formatTime(date: Date): string {
+    return date.toTimeString().split(' ')[0].substring(0, 5);
+  }
+
+
+  validateTimeDifference() {
+    if (this.startDate && this.startTime && this.endDate && this.endTime) {
+      const start = new Date(`${this.startDate}T${this.startTime}`);
+      const end = new Date(`${this.endDate}T${this.endTime}`);
+      const diffMs = end.getTime() - start.getTime();
+      const diffMins = diffMs / 60000;
+
+      if (diffMins < 30) {
+        const minsDifference = Math.round(diffMins);
+        this.errorMessage = `The time difference is ${minsDifference} minutes. It should be at least 30 minutes.`;
+      } else if (diffMins > 1440) {
+        const hrsDifference = Math.floor(diffMins / 60) -24;
+        const minsDifference = Math.round(diffMins % 60);
+        if (minsDifference === 0) {
+          this.errorMessage = `The time difference is ${hrsDifference} hours. It should be at most 24 hours.`;
+        } else {
+          this.errorMessage = `The time difference is ${hrsDifference} hours and ${minsDifference} minutes. It should be at most 24 hours.`;
+        }
+      } else {
+        this.errorMessage = '';
+      }
+    }
+  }
+
+  onSubmit() {
+    this.validateTimeDifference();
+    if (!this.errorMessage) {
+      console.log('Form Submitted!', {
+        startDate: this.startDate,
+        startTime: this.startTime,
+        endDate: this.endDate,
+        endTime: this.endTime
+      });
+    }
+  }
+}
+
+<div>
+    <label for="startDate">Start Date:</label>
+    <input id="startDate" type="date" [(ngModel)]="startDate" (ngModelChange)="updateEndDateLimits()" [min]="minStartDate" required>
+  </div>
+  <div>
+    <label for="startTime">Start Time:</label>
+    <input id="startTime" type="time" [(ngModel)]="startTime" (ngModelChange)="updateEndDateLimits()" required>
+  </div>
+  <div>
+    <label for="endDate">End Date:</label>
+    <input id="endDate" type="date" [(ngModel)]="endDate" [min]="minEndDate" [max]="maxEndDate" (ngModelChange)="updateEndTimeLimits()" required>
+  </div>
+  <div>
+    <label for="endTime">End Time:</label>
+    <input id="endTime" type="time" [(ngModel)]="endTime" [min]="minEndTime" [max]="maxEndTime" required>
+  </div>
+  <button (click)="onSubmit()">Submit</button>
+  <div *ngIf="errorMessage">
+    {{ errorMessage }}
+  </div>
+  
