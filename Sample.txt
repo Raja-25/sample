@@ -165,3 +165,21 @@ _---------------
     </div>
   </ng-container>
 </div>
+_-----------
+@Component({
+  selector: 'app-date-picker',
+  templateUrl: './date-picker.component.html',
+  styleUrls: ['./date-picker.component.css']
+})
+export class DatePickerComponent implements OnInit {
+  minDate: string;
+
+  ngOnInit() {
+    const today = new Date();
+    const dd = String(today.getDate()).padStart(2, '0');
+    const mm = String(today.getMonth() + 1).padStart(2, '0'); // January is 0!
+    const yyyy = today.getFullYear();
+
+    this.minDate = `${yyyy}-${mm}-${dd}`;
+  }
+}
