@@ -1,4 +1,4 @@
-Given that you are using Angular 15 and do not want to use Bootstrap's built-in toast, you can use a separate package for toast notifications. One popular package for Angular is ngx-toastr. Here are the steps to set it up:Install ngx-toastr and @angular/animations:Since you already have @angular/animations installed, you only need to install ngx-toastr.npm install ngx-toastrImport BrowserAnimationsModule and ToastrModule in your AppModule:import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+jiGiven that you are using Angular 15 and do not want to use Bootstrap's built-in toast, you can use a separate package for toast notifications. One popular package for Angular is ngx-toastr. Here are the steps to set it up:Install ngx-toastr and @angular/animations:Since you already have @angular/animations installed, you only need to install ngx-toastr.npm install ngx-toastrImport BrowserAnimationsModule and ToastrModule in your AppModule:import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 
 @NgModule({
@@ -319,3 +319,48 @@ export class DateTimeFormComponent implements OnInit {
     {{ errorMessage }}
   </div>
   
+------
+import { Component, ElementRef } from '@angular/core';
+
+@Component({
+  selector: 'app-your-component',
+  templateUrl: './your-component.component.html',
+  styleUrls: ['./your-component.component.css']
+})
+export class YourComponent {
+  errorMessage1: string = '';
+  errorMessage2: string = '';
+  // Define more error messages as needed
+
+  constructor(private elementRef: ElementRef) {}
+
+  onSubmit() {
+    // Example validation logic
+    if (!this.inputValue1) {
+      this.errorMessage1 = 'Please enter a value for input 1.';
+      this.scrollToError('errorMessage1Ref');
+    } else {
+      this.errorMessage1 = '';
+    }
+
+    if (!this.inputValue2) {
+      this.errorMessage2 = 'Please enter a value for input 2.';
+      this.scrollToError('errorMessage2Ref');
+    } else {
+      this.errorMessage2 = '';
+    }
+
+    // Additional validation logic and error messages
+  }
+
+  scrollToError(elementRefName: string): void {
+    try {
+      const errorMessageElement = this.elementRef.nativeElement.querySelector(`#${elementRefName}`);
+      if (errorMessageElement) {
+        errorMessageElement.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'nearest' });
+      }
+    } catch(err) {
+      console.error('Error scrolling to error message:', err);
+    }
+  }
+}
