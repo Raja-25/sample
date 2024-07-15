@@ -364,3 +364,10 @@ export class YourComponent {
     }
   }
 }
+------------------------
+def parse_xml(xml_string, tag_name):
+    root = ET.fromstring(xml_string)
+    values = []
+    for elem in root.iter(tag_name):
+        values.append(ET.tostring(elem, encoding='unicode', method='xml'))
+    return values
