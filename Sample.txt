@@ -12,3 +12,55 @@ def extract_tag_content(xml_string, tag_name):
         print(f"No content found for tag: {tag_name}")
     
     return matches
+
+
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  template: `
+    <div>
+      Converted Date: {{ convertedDate }}
+      <br>
+      Current Date: {{ currentDate }}
+    </div>
+  `
+})
+export class AppComponent implements OnInit {
+  convertedDate: string;
+  currentDate: string;
+
+  ngOnInit() {
+    // Example timestamp to convert
+    const timestamp = '2024-07-18T07:45:00.000Z';
+
+    // Convert timestamp to Date object
+    const dateObj = new Date(timestamp);
+
+    // Format the converted date
+    this.convertedDate = this.formatDate(dateObj);
+
+    // Get current date in the same format
+    const currentDateObj = new Date();
+    this.currentDate = this.formatDate(currentDateObj);
+  }
+
+  formatDate(date: Date): string {
+    const day = this.padZero(date.getDate());
+    const month = this.padZero(date.getMonth() + 1); // months are zero-based
+    const year = date.getFullYear();
+
+    let hours = date.getHours();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    const minutes = this.padZero(date.getMinutes());
+    const seconds = this.padZero(date.getSeconds());
+
+    return `${day}_${month}_${year} ${hours}:${minutes}:${seconds} ${ampm}`;
+  }
+
+  padZero(value: number): string {
+    return value.toString().padStart(2, '0');
+  }
+}
