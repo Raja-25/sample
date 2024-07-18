@@ -1,4 +1,4 @@
-def extract_tag_content(xml_string, tag_name):
+kodef extract_tag_content(xml_string, tag_name):
     # Define a regex pattern to capture content within the specified tag
     pattern = f'<{tag_name}.*?>(.*?)</{tag_name}>'
     
@@ -64,3 +64,20 @@ export class AppComponent implements OnInit {
     return value.toString().padStart(2, '0');
   }
 }
+from datetime import datetime
+
+# Get the current datetime
+now = datetime.now()
+
+# Format the datetime to the desired format manually
+formatted_date_time = "{:02}-{}-{} {:02}:{:02}:{:02} {}".format(
+    now.day, 
+    now.month, 
+    now.year, 
+    now.hour if now.hour % 12 else 12, 
+    now.minute, 
+    now.second, 
+    "AM" if now.hour < 12 else "PM"
+)
+
+print(formatted_date_time)
